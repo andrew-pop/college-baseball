@@ -1,10 +1,10 @@
-#first we must read in the library's we will need
+#first we must read in the library packages we will need
 library(baseballr)
 library(plyr)
 library(dplyr)
 library(ggplot2)
 
-## create a vector of all Divisison 1 schools#### (missing is Akron(5) and HighPoint(19652), didnt play in 2019) ##
+## create a vector of all Divisison 1 schools (missing is Akron(5) and HighPoint(19652), didnt play in 2019) ##
 
 team<-c(657, 529, 528, 29, 28, 674, 756,754,107,732,110,703,700,698,51,522, 521, 328, 327, 768, 8, 37, 
         433, 430,235,257,365,31,697,694,736,334,434,648, 301,306,312,392,418,416,428,463,509,518,539,559,
@@ -19,7 +19,7 @@ team<-c(657, 529, 528, 29, 28, 674, 756,754,107,732,110,703,700,698,51,522, 521,
         17,2678,261,314,432,553,665,699,493,464,527,308, 649,771,27,30,149,253,254,32,671,646,670,716,498,702,77,260,
         370,534,541,551,610,627,629,631,94,30135,136,1104,471,502,102,1356,536,30024)
        
-## create batting data frame and run the for loop which will acquire all the batting box score statistics ##
+## create batting data frame and run the for loop which will acquire all the batting box score statistics for each school ##
 
 batting<-data.frame()
 
@@ -30,7 +30,7 @@ for(i in team){
 
 ## NOTE:to get pitching data just change the name of the dataframe and put 'pitching' within the quotation marks in ncaa_scrape() ##
 
-batting<-filter(batting,Player != 'Opponent Totals' & Player != 'Totals')   ## get rid of 'Opponent Totals' and 'Totals' within the Player column
+batting<-filter(batting, Player != 'Opponent Totals' & Player != 'Totals')   ## get rid of 'Opponent Totals' and 'Totals' within the Player column
 
 names(batting)[1]<-'season'
 names(batting)[17]<-'X2B'
