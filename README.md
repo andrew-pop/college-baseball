@@ -40,14 +40,19 @@ for(i in team){
 batting<-filter(batting,Player != 'Opponent Totals' & Player != 'Totals')   ## get rid of 'Opponent Totals' and 'Totals' within the Player column
 
 names(batting)[1]<-'season'
+
 names(batting)[17]<-'X2B'
+
 names(batting)[18]<-'X3B'
+
 names(batting)[22]<-'uBB'
+
 names(batting)[26]<-'SO'
 
 batting<-mutate(batting, total_hits=X3B+X2B+HR, X1B=H-total_hits)
 
 batting$season<-as.character(batting$season)
+
 batting$AB<-as.numeric(batting$AB)
 
 batting[is.na(batting)] <- 0
@@ -58,7 +63,9 @@ batting<-woba_plus(batting)
 
 tm_batting <-batting%>% 
   group_by(school, season)%>% 
-  summarize(SB=sum(SB), 
+  summarize(
+  
+            SB=sum(SB), 
             AB=sum(AB), 
             SO=sum(SO), 
             H=sum(H),
@@ -68,12 +75,17 @@ tm_batting <-batting%>%
             X1B=sum(X1B),
             X2B=sum(X2B),
             X3B=sum(X3B),
-            HR=sum(HR))%>%
-  mutate(SO_perc=round(SO/AB, 4)*100, 
+            HR=sum(HR)
+            
+            )%>%
+  mutate(
+         
+         SO_perc=round(SO/AB, 4)*100, 
          BB_perc=round(uBB/AB, 4)*100,
          obp=round((H+uBB+HBP)/(AB+H+uBB+HBP+SF),3), 
          slugg=round((X1B+X2B*2+X3B*3+HR*4)/(AB),3), 
-         OPS=obp+slugg)
+         OPS=obp+slugg
+        )
          
   tm_batting<-woba_plus(tm_batting)
 
