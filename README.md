@@ -1,2 +1,75 @@
-using baseballr to get college baseball boxscore stats
+USING baseballr to grab college baseball boxscore basic statistics 
+
+
+#first we must read in the library's we will need
+library(baseballr)
+library(plyr)
+library(dplyr)
+library(ggplot2)
+
+## create a vector of all Divisison 1 schools#### (missing is Akron(5) and HighPoint(19652), didnt play in 2019) ##
+
+team<-c(657, 529, 528, 29, 28, 674, 756,754,107,732,110,703,700,698,51,522, 521, 328, 327, 768, 8, 37, 
+        433, 430,235,257,365,31,697,694,736,334,434,648, 301,306,312,392,418,416,428,463,509,518,539,559,
+        587,67,147,193,234,255,367,415, 457,490,513,545,746,742,749,14,62, 272, 380, 683, 391,368,140, 164, 
+        196, 288, 404, 651,718,128,782,173,175,236,248,249,340,400,572,575,606,609,596,740,28755,316,1157,355,
+        28600,471,487,2711,678,87,169,251,635,603,739,812,115,48,1092,363,1320,563,456,10411,792,90,97,101,277,
+        99,108,109,111,104,1014,180,1068,283,317,500,711,460,786,458,229,231,366,388,419,523,574,664,9,706,772,
+        109,797,505,514,810,817,80,167,158,172,275,540,554,813,116,220,310,381,386,439, 482,562,576,617,639,47,
+        71,129,204,331,414,503,519,709,774,61,165,178,228,485,488,489,393,72,1045,219,299,305,669,659,735,721,96,
+        466,473,626,630,465,81,127,222,361,410,450,590,748,43,14927,201,202,315,444,454,660,654,692,695,725,83,285,
+        342,352,726,198,244,406,625,141,459,741,769,2915,2,1004,287,2743,346,402,474,483,508,624,655,676,26172,6,7,
+        17,2678,261,314,432,553,665,699,493,464,527,308, 649,771,27,30,149,253,254,32,671,646,670,716,498,702,77,260,
+        370,534,541,551,610,627,629,631,94,30135,136,1104,471,502,102,1356,536,30024)
+       
+## create batting data frame and run the for loop which will acquire all the batting box score statistics ##
+
+batting<-data.frame()
+
+for(i in team){
+    bat<-ncaa_scrape(i, 2019, 'batting')
+    batting<-rbind(batting, bat)
+}
+
+## NOTE:to get pitching data just change the name of the dataframe and put 'pitching' within the quotation marks in ncaa_scrape() ##
+
+batting<-filter(batting,Player != 'Opponent Totals' & Player != 'Totals')   ## get rid of 'Opponent Totals' and 'Totals' within the Player column
+
+names(batting)[1]<-'season'
+names(batting)[17]<-'X2B'
+names(batting)[18]<-'X3B'
+names(batting)[22]<-'uBB'
+names(batting)[26]<-'SO'
+
+batting<-mutate(batting, total_hits=X3B+X2B+HR, X1B=H-total_hits)
+
+batting$season<-as.character(batting$season)
+batting$AB<-as.numeric(batting$AB)
+
+batting[is.na(batting)] <- 0
+
+batting<-woba_plus(batting)
+
+# Run this code to get team totals
+
+tm_batting <-batting%>% 
+  group_by(school, season)%>% 
+  summarize(SB=sum(SB), 
+            AB=sum(AB), 
+            SO=sum(SO), 
+            H=sum(H),
+            uBB=sum(uBB),
+            HBP=sum(HBP),
+            SF=sum(SF),
+            X1B=sum(X1B),
+            X2B=sum(X2B),
+            X3B=sum(X3B),
+            HR=sum(HR))%>%
+  mutate(SO_perc=round(SO/AB, 4)*100, 
+         BB_perc=round(uBB/AB, 4)*100,
+         obp=round((H+uBB+HBP)/(AB+H+uBB+HBP+SF),3), 
+         slugg=round((X1B+X2B*2+X3B*3+HR*4)/(AB),3), 
+         OPS=obp+slugg)
+         
+  tm_batting<-woba_plus(tm_batting)
 
