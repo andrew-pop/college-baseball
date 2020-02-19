@@ -69,3 +69,11 @@ tm_batting <-batting%>%
          OPS=obp+slugg)
          
   tm_batting<-woba_plus(tm_batting)
+  
+  #add the logos
+  
+  logo<-read.csv('division1baseball-logos.csv')
+  
+  logo<-logo[-1]
+  
+  tm_batting<-inner_join(tm_batting, logo, by='school')
